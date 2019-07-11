@@ -1,0 +1,136 @@
+<meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@8"></script>
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+
+ <script
+  src="https://code.jquery.com/jquery-3.4.1.min.js"
+  integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+  crossorigin="anonymous"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+<body>
+
+ 
+
+<div class="container">
+  <br>
+  <center><h1>Enter Details !</h1></center><br><br>
+<!--   <p>The form below contains two dropdown menus (select lists):</p>
+ -->  <form>
+    <div class="form-group">
+      <label for="sel1">Select Locality of the Crime :</label><br>
+      <select class="form-control" onchange="a()" id="sel1" name="sellist1">
+<option class="aman"> </option>
+       <% for i in @clist do %>
+
+        <option class="aman"><%= i %> </option>
+        <% end%>
+      </select>
+      <br>
+      <label for="sel2">Select Type of the Crime :</label><br>
+<select class="form-control pla" id="sel2" name="sellist2">
+       
+      </select>
+    </div>
+    <br>
+    <center><div class="container">
+      
+<button type="submit" id="submit" class="btn btn-outline-danger" onclick="smit()">Submit</button>
+<button type="submit" id="submit2"class="btn btn-outline-danger" onclick="ma()">Back</button>
+     </div>
+
+      </center>
+  </form>
+</div>
+
+</body>
+
+<script type="text/javascript">
+document.getElementById("submit2").addEventListener("click", function(event){
+  event.preventDefault()
+});
+
+function ma() {
+window.location.href = "/";
+
+
+}
+
+document.getElementById("submit").addEventListener("click", function(event){
+  event.preventDefault()
+});
+  
+var p = <%= raw json_escape(@loc.to_json) %>;
+
+function a()
+{
+	var x = document.getElementById("sel1").selectedIndex;
+  var l=document.getElementsByClassName("aman")[x].value;
+
+if($("#sel2").length){
+	$("#sel2").empty();
+
+}
+	
+	
+for(i=0;i<p.length;i++)
+{var o = new Option(p[i]);
+	o.setAttribute('class', 'note');
+/// jquerify the DOM object 'o' so we can use the html method
+$(o).html(p[i]);
+
+$("#sel2").append(o);
+
+}
+}
+
+
+
+function  smit(){
+
+
+
+
+var x = document.getElementById("sel1").selectedIndex;
+  var l=document.getElementsByClassName("aman")[x].value;
+
+
+if(x != 0){
+var x2 = document.getElementById("sel2").selectedIndex;
+var la=document.getElementsByClassName("note")[x2];
+  var l2="'"+document.getElementsByClassName("note")[x2].value+"'";
+	
+$.ajax({
+  type:"GET",
+  url:"insertdata",
+  dataType:"json",
+  data: { type: l , locality: l2 },
+  success:function(result){
+Swal.fire(
+  {
+  type: 'info',
+  title: 'SafePath',
+  text: 'Crime is Successfully Added !',
+}
+)   
+}
+})
+}
+else
+{
+Swal.fire({
+  type: 'error',
+  title: 'Oops...',
+  text: 'Locality not Selected!'
+})}
+
+}
+
+</script>
+
+

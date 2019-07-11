@@ -1,0 +1,610 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <title>SafePath</title>
+
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.css" >
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+
+<link href="https://fonts.googleapis.com/css?family=Spectral:700" rel="stylesheet">
+    <meta charset="utf-8">
+    <style>
+      
+
+
+      #map {
+        height: 80%;
+width: 80%;
+/*border:1px solid;*/
+      }
+      html, body {
+        margin: 20;
+        padding: 20;
+        height: 100%;
+        
+      }
+
+    li{
+font-family: 'Spectral', serif;
+font-style: bold;
+font-size: 15px;
+
+      }
+      .controls {
+        height: 30px;
+       
+               border-radius: 10px 10px 10px 10px;
+
+        border: 1px solid transparent;
+         margin-top: 11px;
+ 
+      }
+
+      #enter-origin,
+      #enter-des {
+        background-color: #fff;
+        font-family: Roboto;
+        font-size: 15px;
+        font-weight: 300;
+        margin-left: 12px;
+        padding: 0 11px 0 13px;
+        text-overflow: ellipsis;
+        width: 200px;
+      }
+
+      #enter-origin:focus,
+      #enter-des:focus {
+        border-color: #4d90fe;
+      }
+
+      #select-mode {
+        color: #fff;
+        background-color: black;
+        margin-left: 12px;
+        padding: 5px 11px 0px 11px;
+      }
+
+      #select-mode label {
+        font-family: Roboto;
+        font-size: 13px;
+        font-weight: 300;
+      }
+     
+#safepath{
+          font-size: 13px;
+
+}
+
+
+    </style>
+  </head>
+  <body>
+    
+<br>
+<!-- <div class="ui placeholder segment container">
+ -->  <div class="ui  center aligned grid">
+    
+<!--     <div class="middle aligned row">
+ -->      
+      <div class="column">
+
+        <div class="ui icon header ">
+
+          <i class="world icon"></i>
+ 
+<h1 style="margin: -5px">SafePath  </h1>    
+</div>
+        
+      </div>
+    </div>
+  <!-- </div> -->
+<!-- </div>
+ -->
+
+
+
+    <input id="enter-origin" class="controls" type="text" placeholder="Origin">
+
+<input id="enter-des" class="controls" type="text"  placeholder="Destination">
+
+    <div id="select-mode" class="controls" >
+      <input type="radio" name="type" id="changemode-walking" >
+      <label for="changemode-walking">Walk</label>
+
+      <input type="radio" name="type" id="changemode-transit">
+      <label for="changemode-transit">Transit</label>
+
+      <input type="radio" name="type" id="changemode-driving" checked="checked">
+      <label for="changemode-driving">Drive</label>
+    </div>
+
+    <div id="map" class="ui container"></div>
+  
+     <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAi5YIk-_EH65BJt7We9f3LVqydLZ9Esms&libraries=places"
+        ></script>
+   
+
+<script type="text/javascript">
+  if(document.body.clientWidth < 600)
+ {
+document.getElementById("select-mode").style.marginTop = "50px !important;";
+document.getElementById("select-mode").style.marginleft = "50px !important;";
+}
+
+</script>
+
+    <script>
+   
+
+
+
+      var  mydata=  
+[{'n': 'CHITRANJAN PARK', 'type': 'Feature', 'properties': {'mag': 1}, 'lati': 77.2492, 'longi': 28.5363}, {'n': 'DABRI', 'type': 'Feature', 'properties': {'mag': 3}, 'lati': 77.086, 'longi': 28.6127}, {'n': 'MALVIYA NAGAR', 'type': 'Feature', 'properties': {'mag': 4}, 'lati': 77.2042, 'longi': 28.5299}, {'n': 'CHANDNI MAHAL', 'type': 'Feature', 'properties': {'mag': 1}, 'lati': 77.2361, 'longi': 28.6436}, {'n': 'MODEL TOWN', 'type': 'Feature', 'properties': {'mag': 1}, 'lati': 77.1937, 'longi': 28.7026}, {'n': 'ANANDVIHAR', 'type': 'Feature', 'properties': {'mag': 3}, 'lati': 77.2937, 'longi': 28.6534}, {'n': 'KASHMERE GATE', 'type': 'Feature', 'properties': {'mag': 2}, 'lati': 77.2262, 'longi': 28.6664}, {'n': 'GOVIND PURI', 'type': 'Feature', 'properties': {'mag': 1}, 'lati': 77.2653, 'longi': 28.5307}, {'n': 'BINDAPUR', 'type': 'Feature', 'properties': {'mag': 1}, 'lati': 77.0662, 'longi': 28.6091}, {'n': 'NEW FRIENDS COLONY', 'type': 'Feature', 'properties': {'mag': 1}, 'lati': 77.2676, 'longi': 28.5623}, {'n': 'SARITA VIHAR', 'type': 'Feature', 'properties': {'mag': 0}, 'lati': 77.3062, 'longi': 28.523}, {'n': 'TIMARPUR', 'type': 'Feature', 'properties': {'mag': 3}, 'lati': 77.2242, 'longi': 28.7072}, {'n': 'KANJHAWALA', 'type': 'Feature', 'properties': {'mag': 2}, 'lati': 77.0036, 'longi': 28.7258}, {'n': 'ANAND PARBAT', 'type': 'Feature', 'properties': {'mag': 3}, 'lati': 77.1738, 'longi': 28.66}, {'n': 'SAGARPUR', 'type': 'Feature', 'properties': {'mag': 0}, 'lati': 77.0864, 'longi': 28.5914}, {'n': 'PRASHANT VIHAR', 'type': 'Feature', 'properties': {'mag': 3}, 'lati': 77.1276, 'longi': 28.7179}, {'n': 'SOUTH CAMPUS', 'type': 'Feature', 'properties': {'mag': 3}, 'lati': 77.179, 'longi': 28.5705}, {'n': 'ROHINI SOUTH', 'type': 'Feature', 'properties': {'mag': 3}, 'lati': 77.1159, 'longi': 28.7024}, {'n': 'PUNJABI BAGH', 'type': 'Feature', 'properties': {'mag': 4}, 'lati': 77.1328, 'longi': 28.6744}, {'n': 'DWARKA NORTH', 'type': 'Feature', 'properties': {'mag': 0}, 'lati': 77.0156, 'longi': 28.6037}, {'n': 'BURARI', 'type': 'Feature', 'properties': {'mag': 1}, 'lati': 77.1974, 'longi': 28.7366}, {'n': 'JAMA MASJID', 'type': 'Feature', 'properties': {'mag': 0}, 'lati': 77.2336, 'longi': 28.6528}, {'n': 'ADRASH NAGAR', 'type': 'Feature', 'properties': {'mag': 1}, 'lati': 77.1753, 'longi': 28.7098}, {'n': 'CHANAKYAPURI', 'type': 'Feature', 'properties': {'mag': 1}, 'lati': 77.1961, 'longi': 28.6034}, {'n': 'PANDAV NAGAR', 'type': 'Feature', 'properties': {'mag': 2}, 'lati': 77.3026, 'longi': 28.6204}, {'n': 'MIANWALI NAGAR', 'type': 'Feature', 'properties': {'mag': 1}, 'lati': 77.0888, 'longi': 28.6796}, {'n': 'FATEHPUR BERI', 'type': 'Feature', 'properties': {'mag': 1}, 'lati': 77.1511, 'longi': 28.4655}, {'n': 'NABI KARIM', 'type': 'Feature', 'properties': {'mag': 1}, 'lati': 77.2175, 'longi': 28.6498}, {'n': 'RAJOURI GARDEN', 'type': 'Feature', 'properties': {'mag': 1}, 'lati': 77.1199, 'longi': 28.6397}, {'n': 'JAHANGIR PURI', 'type': 'Feature', 'properties': {'mag': 2}, 'lati': 77.1749, 'longi': 28.7336}, {'n': 'KAMLA MARKET', 'type': 'Feature', 'properties': {'mag': 0}, 'lati': 77.2262, 'longi': 28.643}, {'n': 'BARAKHAMBA ROAD', 'type': 'Feature', 'properties': {'mag': 3}, 'lati': 77.225, 'longi': 28.6309}, {'n': 'SAFDARJUNG ENCLAVE', 'type': 'Feature', 'properties': {'mag': 0}, 'lati': 77.2049, 'longi': 28.5693}, {'n': 'MUKHERJI NAGAR', 'type': 'Feature', 'properties': {'mag': 1}, 'lati': 77.2086, 'longi': 28.7002}, {'n': 'FARASH BAZAR', 'type': 'Feature', 'properties': {'mag': 1}, 'lati': 77.2922, 'longi': 28.6688}, {'n': 'KALKAJI', 'type': 'Feature', 'properties': {'mag': 0}, 'lati': 77.2574, 'longi': 28.5332}, {'n': 'KALKAJI', 'type': 'Feature', 'properties': {'mag': 0}, 'lati': 77.2564, 'longi': 28.5473}, {'n': 'PARSHAD NAGAR', 'type': 'Feature', 'properties': {'mag': 1}, 'lati': 77.1805, 'longi': 28.6478}, {'n': 'LODHI COLONY', 'type': 'Feature', 'properties': {'mag': 0}, 'lati': 77.2405, 'longi': 28.5874}, {'n': 'INDERPURI', 'type': 'Feature', 'properties': {'mag': 0}, 'lati': 77.145, 'longi': 28.6308}, {'n': 'OKHLA', 'type': 'Feature', 'properties': {'mag': 2}, 'lati': 77.2746, 'longi': 28.5268}, {'n': 'SAMAYPURBADLI', 'type': 'Feature', 'properties': {'mag': 0}, 'lati': 77.1422, 'longi': 28.7252}, {'n': 'JAFFARPUR KALAN', 'type': 'Feature', 'properties': {'mag': 1}, 'lati': 76.9156, 'longi': 28.5957}, {'n': 'MAYA PURI', 'type': 'Feature', 'properties': {'mag': 2}, 'lati': 77.1208, 'longi': 28.6266}, {'n': 'AMAN VIHAR', 'type': 'Feature', 'properties': {'mag': 3}, 'lati': 77.0608, 'longi': 28.7096}, {'n': 'VIJAY VIHAR', 'type': 'Feature', 'properties': {'mag': 0}, 'lati': 77.1019, 'longi': 28.71}, {'n': 'AMAR COLONY', 'type': 'Feature', 'properties': {'mag': 4}, 'lati': 77.2409, 'longi': 28.5591}, {'n': 'ALIPUR', 'type': 'Feature', 'properties': {'mag': 3}, 'lati': 77.1391, 'longi': 28.799}, {'n': 'MAHENDRA PARK', 'type': 'Feature', 'properties': {'mag': 1}, 'lati': 77.1642, 'longi': 28.7258}, {'n': 'VASANT KUNJ SOUTH', 'type': 'Feature', 'properties': {'mag': 0}, 'lati': 77.1524, 'longi': 28.5349}, {'n': 'BHALSWA DAIRY', 'type': 'Feature', 'properties': {'mag': 2}, 'lati': 77.1657, 'longi': 28.7429}, {'n': 'BAWANA', 'type': 'Feature', 'properties': {'mag': 3}, 'lati': 77.0425, 'longi': 28.7965}, {'n': 'BEGUM PUR', 'type': 'Feature', 'properties': {'mag': 1}, 'lati': 77.0518, 'longi': 28.7245}, {'n': 'NARAINA', 'type': 'Feature', 'properties': {'mag': 1}, 'lati': 77.1378, 'longi': 28.6336}, {'n': 'NEB SARAI', 'type': 'Feature', 'properties': {'mag': 2}, 'lati': 77.2143, 'longi': 28.4989}, {'n': 'RAJINDER NAGAR', 'type': 'Feature', 'properties': {'mag': 2}, 'lati': 77.1828, 'longi': 28.635}, {'n': 'SHALIMAR BAGH', 'type': 'Feature', 'properties': {'mag': 3}, 'lati': 77.1571, 'longi': 28.7168}, {'n': 'KESHAV PURAM', 'type': 'Feature', 'properties': {'mag': 4}, 'lati': 77.1598, 'longi': 28.6842}, {'n': 'RANI BAGH', 'type': 'Feature', 'properties': {'mag': 3}, 'lati': 77.1193, 'longi': 28.6978}, {'n': 'BARA HINDU RAO', 'type': 'Feature', 'properties': {'mag': 2}, 'lati': 77.2085, 'longi': 28.6654}, {'n': 'CONNAUGHT PLACE', 'type': 'Feature', 'properties': {'mag': 1}, 'lati': 77.2143, 'longi': 28.63}, {'n': 'H. N. DIN', 'type': 'Feature', 'properties': {'mag': 0}, 'lati': 77.2442, 'longi': 28.5924}, {'n': 'DARYA GANJ', 'type': 'Feature', 'properties': {'mag': 0}, 'lati': 77.2406, 'longi': 28.6419}, {'n': 'MANGOLPURI', 'type': 'Feature', 'properties': {'mag': 2}, 'lati': 77.0916, 'longi': 28.6966}, {'n': 'VIVEKVIHAR', 'type': 'Feature', 'properties': {'mag': 0}, 'lati': 77.3066, 'longi': 28.6668}, {'n': 'LAHORI GATE', 'type': 'Feature', 'properties': {'mag': 2}, 'lati': 77.2188, 'longi': 28.6556}, {'n': 'SULTAN PURI', 'type': 'Feature', 'properties': {'mag': 1}, 'lati': 77.0786, 'longi': 28.7026}, {'n': 'GEETA COLONY', 'type': 'Feature', 'properties': {'mag': 0}, 'lati': 77.2764, 'longi': 28.6554}, {'n': 'CIVIL LINES', 'type': 'Feature', 'properties': {'mag': 1}, 'lati': 77.2215, 'longi': 28.6885}, {'n': 'ASHOK VIHAR', 'type': 'Feature', 'properties': {'mag': 2}, 'lati': 77.1743, 'longi': 28.6924}, {'n': 'TILAK NAGAR', 'type': 'Feature', 'properties': {'mag': 3}, 'lati': 77.1014, 'longi': 28.639}, {'n': 'PALAM VILLAGE', 'type': 'Feature', 'properties': {'mag': 2}, 'lati': 77.0829, 'longi': 28.5881}, {'n': 'MOTI NAGAR', 'type': 'Feature', 'properties': {'mag': 4}, 'lati': 77.1466, 'longi': 28.6601}, {'n': 'HARI NAGAR', 'type': 'Feature', 'properties': {'mag': 2}, 'lati': 77.0995, 'longi': 28.6094}, {'n': 'PAHARGANJ', 'type': 'Feature', 'properties': {'mag': 2}, 'lati': 77.2093, 'longi': 28.6458}, {'n': 'SADAR BAZAR', 'type': 'Feature', 'properties': {'mag': 0}, 'lati': 77.2112, 'longi': 28.654}, {'n': 'SAROJINI NAGAR', 'type': 'Feature', 'properties': {'mag': 0}, 'lati': 77.1991, 'longi': 28.5745}, {'n': 'NAJAFGARH', 'type': 'Feature', 'properties': {'mag': 1}, 'lati': 76.9827, 'longi': 28.6098}, {'n': 'KAPASHERA', 'type': 'Feature', 'properties': {'mag': 2}, 'lati': 77.0872, 'longi': 28.5296}, {'n': 'KALYANPURI', 'type': 'Feature', 'properties': {'mag': 0}, 'lati': 77.3171, 'longi': 28.6136}, {'n': 'BADAR PUR', 'type': 'Feature', 'properties': {'mag': 1}, 'lati': 77.3036, 'longi': 28.4938}, {'n': 'SUBHASH PLACE', 'type': 'Feature', 'properties': {'mag': 4}, 'lati': 77.1441, 'longi': 28.689}, {'n': 'SUBZIMANDI', 'type': 'Feature', 'properties': {'mag': 3}, 'lati': 77.2077, 'longi': 28.6692}, {'n': 'MAURICE NAGAR', 'type': 'Feature', 'properties': {'mag': 2}, 'lati': 77.2065, 'longi': 28.6925}, {'n': 'MANDIR MARG', 'type': 'Feature', 'properties': {'mag': 4}, 'lati': 77.2032, 'longi': 28.6386}, {'n': 'TUGLAK ROAD', 'type': 'Feature', 'properties': {'mag': 1}, 'lati': 77.2112, 'longi': 28.5983}, {'n': 'LAJPAT NAGAR', 'type': 'Feature', 'properties': {'mag': 0}, 'lati': 77.2405, 'longi': 28.5684}, {'n': 'KRISHNA NAGAR', 'type': 'Feature', 'properties': {'mag': 2}, 'lati': 77.2807, 'longi': 28.667}, {'n': 'PRASHANT VIHAR', 'type': 'Feature', 'properties': {'mag': 3}, 'lati': 77.2337, 'longi': 28.6042}, {'n': 'ANANDVIHAR', 'type': 'Feature', 'properties': {'mag': 3}, 'lati': 77.3131, 'longi': 28.656}, {'n': 'SWARUP NAGAR', 'type': 'Feature', 'properties': {'mag': 2}, 'lati': 77.1562, 'longi': 28.7584}, {'n': 'GREATER KAILASH', 'type': 'Feature', 'properties': {'mag': 0}, 'lati': 77.2328, 'longi': 28.5541}, {'n': 'VIKAS PURI', 'type': 'Feature', 'properties': {'mag': 0}, 'lati': 77.0683, 'longi': 28.63}, {'n': 'UTTAM NAGAR', 'type': 'Feature', 'properties': {'mag': 4}, 'lati': 77.0649, 'longi': 28.625}, {'n': 'DEFENCE COLONY', 'type': 'Feature', 'properties': {'mag': 2}, 'lati': 77.2334, 'longi': 28.5647}, {'n': 'JAMIA NAGAR', 'type': 'Feature', 'properties': {'mag': 2}, 'lati': 77.2924, 'longi': 28.5621}, {'n': 'KASHMERE GATE', 'type': 'Feature', 'properties': {'mag': 2}, 'lati': 77.2315, 'longi': 28.6625}, {'n': 'PULPRAHLAD PUR', 'type': 'Feature', 'properties': {'mag': 1}, 'lati': 77.291, 'longi': 28.5016}, {'n': 'SARITA VIHAR', 'type': 'Feature', 'properties': {'mag': 0}, 'lati': 77.282, 'longi': 28.5405}, {'n': 'NANGLOI', 'type': 'Feature', 'properties': {'mag': 4}, 'lati': 77.067, 'longi': 28.682}, {'n': 'SAFDARJUNG ENCLAVE', 'type': 'Feature', 'properties': {'mag': 0}, 'lati': 77.1986, 'longi': 28.5585}, {'n': 'HAUZQAZI', 'type': 'Feature', 'properties': {'mag': 1}, 'lati': 77.2255, 'longi': 28.6434}, {'n': 'DWARKA SOUTH', 'type': 'Feature', 'properties': {'mag': 2}, 'lati': 77.0667, 'longi': 28.5784}, {'n': 'PASCHIM VIHAR', 'type': 'Feature', 'properties': {'mag': 1}, 'lati': 77.1012, 'longi': 28.6711}, {'n': 'BINDAPUR', 'type': 'Feature', 'properties': {'mag': 1}, 'lati': 77.0674, 'longi': 28.6205}, {'n': 'TILAK MARG', 'type': 'Feature', 'properties': {'mag': 2}, 'lati': 77.2354, 'longi': 28.6182}, {'n': 'RAJOURI GARDEN', 'type': 'Feature', 'properties': {'mag': 1}, 'lati': 77.1196, 'longi': 28.6515}, {'n': 'SANGAM VIHAR', 'type': 'Feature', 'properties': {'mag': 0}, 'lati': 77.243, 'longi': 28.5096}, {'n': 'MAYURVIHAR', 'type': 'Feature', 'properties': {'mag': 0}, 'lati': 77.3037, 'longi': 28.6073}, {'n': 'SHAHBAD DAIRY', 'type': 'Feature', 'properties': {'mag': 0}, 'lati': 77.0789, 'longi': 28.7477}, {'n': 'GANDHI NAGAR', 'type': 'Feature', 'properties': {'mag': 0}, 'lati': 77.2673, 'longi': 28.6596}, {'n': 'DWARKA SEC-23', 'type': 'Feature', 'properties': {'mag': 0}, 'lati': 77.0585, 'longi': 28.5641}, {'n': 'RANJIT NAGAR', 'type': 'Feature', 'properties': {'mag': 1}, 'lati': 77.1587, 'longi': 28.6475}, {'n': 'RANHOLA', 'type': 'Feature', 'properties': {'mag': 3}, 'lati': 77.036, 'longi': 28.6538}, {'n': 'SAKET', 'type': 'Feature', 'properties': {'mag': 0}, 'lati': 77.2272, 'longi': 28.5288}, {'n': 'SHAKARPUR', 'type': 'Feature', 'properties': {'mag': 0}, 'lati': 77.2703, 'longi': 28.6378}, {'n': 'PREETVIHAR', 'type': 'Feature', 'properties': {'mag': 1}, 'lati': 77.2953, 'longi': 28.6385}, {'n': 'KIRTI NAGAR', 'type': 'Feature', 'properties': {'mag': 2}, 'lati': 77.1351, 'longi': 28.6405}, {'n': 'HAUZ KHAS', 'type': 'Feature', 'properties': {'mag': 2}, 'lati': 77.2085, 'longi': 28.5494}, {'n': 'BAWANA', 'type': 'Feature', 'properties': {'mag': 3}, 'lati': 77.0228, 'longi': 28.8066}, {'n': 'KN KATJU MARG', 'type': 'Feature', 'properties': {'mag': 0}, 'lati': 77.121, 'longi': 28.7304}, {'n': 'I.P. ESTATE', 'type': 'Feature', 'properties': {'mag': 2}, 'lati': 77.2472, 'longi': 28.6274}, {'n': 'KOTALA MUBARAK PUR', 'type': 'Feature', 'properties': {'mag': 2}, 'lati': 77.2251, 'longi': 28.5759}, {'n': 'DELHI CANTT', 'type': 'Feature', 'properties': {'mag': 0}, 'lati': 77.1244, 'longi': 28.5987}, {'n': 'D.B.G ROAD', 'type': 'Feature', 'properties': {'mag': 1}, 'lati': 77.1933, 'longi': 28.6526}, {'n': 'KHYALA', 'type': 'Feature', 'properties': {'mag': 4}, 'lati': 77.1133, 'longi': 28.6576}, {'n': 'JAGATPURI', 'type': 'Feature', 'properties': {'mag': 4}, 'lati': 77.2839, 'longi': 28.6436}, {'n': 'PATEL NAGAR', 'type': 'Feature', 'properties': {'mag': 1}, 'lati': 77.1582, 'longi': 28.6524}, {'n': 'VASANT VIHAR', 'type': 'Feature', 'properties': {'mag': 0}, 'lati': 77.1693, 'longi': 28.558}, {'n': 'KAROL BAGH', 'type': 'Feature', 'properties': {'mag': 2}, 'lati': 77.1932, 'longi': 28.6526}, {'n': 'SUNLIGHT COLONY', 'type': 'Feature', 'properties': {'mag': 4}, 'lati': 77.2602, 'longi': 28.5784}, {'n': 'NARELA', 'type': 'Feature', 'properties': {'mag': 2}, 'lati': 77.0885, 'longi': 28.8532}, {'n': 'NEW ASHOK NAGAR', 'type': 'Feature', 'properties': {'mag': 4}, 'lati': 77.3118, 'longi': 28.5982}, {'n': 'PARLIAMENT STREET', 'type': 'Feature', 'properties': {'mag': 1}, 'lati': 77.2137, 'longi': 28.6247}, {'n': 'NIHAL VIHAR', 'type': 'Feature', 'properties': {'mag': 1}, 'lati': 77.0717, 'longi': 28.665}, {'n': 'MADHUVIHAR', 'type': 'Feature', 'properties': {'mag': 2}, 'lati': 77.3061, 'longi': 28.6254}, {'n': 'BHARAT NAGAR', 'type': 'Feature', 'properties': {'mag': 1}, 'lati': 77.1785, 'longi': 28.6806}, {'n': 'MANDAWALI', 'type': 'Feature', 'properties': {'mag': 1}, 'lati': 77.3061, 'longi': 28.6254}, {'n': 'BABA HARI DAS NAGAR', 'type': 'Feature', 'properties': {'mag': 1}, 'lati': 76.9668, 'longi': 28.6287}, {'n': 'CHHAWLA', 'type': 'Feature', 'properties': {'mag': 1}, 'lati': 76.9947, 'longi': 28.5869}, {'n': 'MEHRAULI', 'type': 'Feature', 'properties': {'mag': 1}, 'lati': 77.1802, 'longi': 28.5215}, {'n': 'MAURYA ENCLAVE', 'type': 'Feature', 'properties': {'mag': 2}, 'lati': 77.146, 'longi': 28.7004}, {'n': 'JANAK PURI', 'type': 'Feature', 'properties': {'mag': 2}, 'lati': 77.0819, 'longi': 28.6286}, {'n': 'SARAI ROHILLA', 'type': 'Feature', 'properties': {'mag': 0}, 'lati': 77.1837, 'longi': 28.6684}, {'n': 'GULABIBAGH', 'type': 'Feature', 'properties': {'mag': 0}, 'lati': 77.1926, 'longi': 28.67}, {'n': 'ROOP NAGAR', 'type': 'Feature', 'properties': {'mag': 3}, 'lati': 77.2026, 'longi': 28.685}, {'n': 'VASANT KUNJ NORTH', 'type': 'Feature', 'properties': {'mag': 1}, 'lati': 77.1523, 'longi': 28.5349}, {'n': 'ROHINI NORTH', 'type': 'Feature', 'properties': {'mag': 2}, 'lati': 77.1182, 'longi': 28.7089}, {'n': 'GHAZIPUR', 'type': 'Feature', 'properties': {'mag': 0}, 'lati': 77.3327, 'longi': 28.6249}, {'n': 'SEEMAPURI', 'type': 'Feature', 'properties': {'mag': 0}, 'lati': 77.3165, 'longi': 28.6781}, {'n': 'SEELAMPUR', 'type': 'Feature', 'properties': {'mag': 1}, 'lati': 77.2686, 'longi': 28.6743}, {'n': 'MANSAROVAR PARK', 'type': 'Feature', 'properties': {'mag': 3}, 'lati': 77.2986, 'longi': 28.6828}, {'n': 'SHAHDARA', 'type': 'Feature', 'properties': {'mag': 2}, 'lati': 77.2852, 'longi': 28.6742}, {'n': 'KHAJURIKHAS', 'type': 'Feature', 'properties': {'mag': 0}, 'lati': 77.2561, 'longi': 28.7111}, {'n': 'JYOTI NAGAR', 'type': 'Feature', 'properties': {'mag': 2}, 'lati': 77.2917, 'longi': 28.6961}, {'n': 'HARSH VIHAR', 'type': 'Feature', 'properties': {'mag': 1}, 'lati': 77.3185, 'longi': 28.706}, {'n': 'MUNDKA', 'type': 'Feature', 'properties': {'mag': 0}, 'lati': 76.9608, 'longi': 28.6704}, {'n': 'BHAJANPURI', 'type': 'Feature', 'properties': {'mag': 2}, 'lati': 77.2644, 'longi': 28.7013}, {'n': 'ZAFRABAD', 'type': 'Feature', 'properties': {'mag': 0}, 'lati': 77.273, 'longi': 28.6791}, {'n': 'WELCOME', 'type': 'Feature', 'properties': {'mag': 0}, 'lati': 77.2748, 'longi': 28.6734}, {'n': 'NANDNAGARI', 'type': 'Feature', 'properties': {'mag': 3}, 'lati': 77.3082, 'longi': 28.6985}, {'n': 'G.T.B. ENCLAVE', 'type': 'Feature', 'properties': {'mag': 0}, 'lati': 77.316, 'longi': 28.685}, {'n': 'NEW USMANPUR', 'type': 'Feature', 'properties': {'mag': 1}, 'lati': 77.2621, 'longi': 28.672}, {'n': 'SONIA VIHAR', 'type': 'Feature', 'properties': {'mag': 2}, 'lati': 77.2561, 'longi': 28.7113}, {'n': 'KARAWAL NAGAR', 'type': 'Feature', 'properties': {'mag': 2}, 'lati': 77.2745, 'longi': 28.7328}, {'n': 'GOKULPURI', 'type': 'Feature', 'properties': {'mag': 2}, 'lati': 77.2808, 'longi': 28.7022}];
+        var map;
+        var directionsDisplay;
+          var directionsService;
+
+      function initMap(location) {
+         directionsService = new google.maps.DirectionsService();
+          directionsDisplay = new google.maps.DirectionsRenderer();
+          var loc = new google.maps.LatLng(location.coords.latitude,location.coords.longitude);
+        map = new google.maps.Map(document.getElementById('map'), {
+          zoom: 10,
+          
+
+          mapTypeControl: true,
+          mapTypeControlOptions: {
+              style: google.maps.MapTypeControlStyle.HORIZONTAL_BAR,
+              position: google.maps.ControlPosition.TOP_RIGHT
+          },
+          center: loc,
+        });
+        var marker = new google.maps.Marker({
+          position: loc,
+          animation: google.maps.Animation.DROP,
+title:"You are Here",
+          map: map
+        }); 
+
+         directionsDisplay.setMap(map);
+         var script = document.createElement('script');
+         document.getElementsByTagName('head')[0].appendChild(script);
+
+          map.data.setStyle(function(feature) {
+          var magnitude = feature.getProperty('mag');
+         console.log(typeof(magnitude));
+          return {
+            icon: getCircle(magnitude)
+          };
+        });
+        new AutocompleteDirectionsHandler(map);
+      }
+      function getCircle(magnitude) {
+        return {
+          path: google.maps.SymbolPath.CIRCLE,
+          fillColor: 'red',
+          fillOpacity: .2,
+          scale: Math.pow(2, magnitude) / 2,
+          strokeColor: 'red',
+          strokeWeight: .6
+        };
+      }
+
+       
+      function AutocompleteDirectionsHandler(map) {
+        this.map = map;
+        this.originPlaceId = null;
+        this.destinationPlaceId = null;
+        this.travelMode = 'DRIVING';
+        var originInput = document.getElementById('enter-origin');
+        var modeSelector = document.getElementById('select-mode');
+        var destinationInput = document.getElementById('enter-des');
+        this.directionsDisplay = new google.maps.DirectionsRenderer;
+
+        this.directionsService = new google.maps.DirectionsService;
+        this.directionsDisplay.setMap(map);
+
+        var originAutocomplete = new google.maps.places.Autocomplete(
+            originInput, {placeIdOnly: true});
+        var destinationAutocomplete = new google.maps.places.Autocomplete(
+            destinationInput, {placeIdOnly: true});
+        this.setupClickListener('changemode-walking', 'WALKING');
+        
+        this.setupClickListener('changemode-transit', 'TRANSIT');
+        this.setupClickListener('changemode-driving', 'DRIVING');
+
+        this.setupPlaceChangedListener(originAutocomplete, 'ORIG');
+                this.setupPlaceChangedListener(destinationAutocomplete, 'DEST');
+
+
+        
+
+        // this.map.controls[google.maps.ControlPosition.TOP_LEFT].push(modeSelector);
+     if(document.body.clientWidth < 600)
+ {this.map.controls[google.maps.ControlPosition.LEFT_TOP].push(originInput);
+                this.map.controls[google.maps.ControlPosition.LEFT_TOP].push(destinationInput);
+        this.map.controls[google.maps.ControlPosition.LEFT_TOP].push(modeSelector);
+
+
+
+}else
+{this.map.controls[google.maps.ControlPosition.TOP_LEFT].push(originInput);
+                this.map.controls[google.maps.ControlPosition.TOP_LEFT].push(destinationInput);
+  this.map.controls[google.maps.ControlPosition.TOP_LEFT].push(modeSelector);
+
+}
+
+
+      }
+
+    
+      AutocompleteDirectionsHandler.prototype.setupClickListener = function(id, mode) {
+                var me = this;
+
+        var radioButton = document.getElementById(id);
+        radioButton.addEventListener('click', function() {
+          me.travelMode = mode;
+          me.route();
+        });
+      };
+
+      AutocompleteDirectionsHandler.prototype.setupPlaceChangedListener = function(autocomplete, mode) {
+        var me = this;
+        autocomplete.bindTo('bounds', this.map);
+        autocomplete.addListener('place_changed', function() {
+          var place = autocomplete.getPlace();
+          if (!place.place_id) {
+            window.alert("Select from dropdown only");
+            return;
+          }
+          if (mode === 'ORIG') {
+            me.originPlaceId = place.place_id;
+          } else {
+            me.destinationPlaceId = place.place_id;
+          }
+          me.route();
+        });
+
+      };
+
+      AutocompleteDirectionsHandler.prototype.route = function() {
+        if (!this.originPlaceId || !this.destinationPlaceId) {
+          return;
+        }
+        var me = this;
+
+        this.directionsService.route({
+          origin: {'placeId': this.originPlaceId},
+          destination: {'placeId': this.destinationPlaceId},
+          travelMode: this.travelMode,
+          provideRouteAlternatives: true,
+          unitSystem: google.maps.UnitSystem.METRIC
+        }, function(response, status) {
+          if (status === 'OK') {
+            var img1 = {
+          url: 'https://pngimg.com/uploads/number5/number5_PNG15082.png',
+           scaledSize: new google.maps.Size(28, 28),
+    
+        };
+          var img2 = {
+          url: 'https://pngimg.com/uploads/number4/number4_PNG15036.png',
+           scaledSize: new google.maps.Size(28, 28),
+    
+        };
+        ;
+          var img3 = {
+          url: 'https://pngimg.com/uploads/number3/number3_PNG14994.png',
+           scaledSize: new google.maps.Size(23, 23),
+    
+        };
+        var img4 = {
+          url: 'https://pngimg.com/uploads/number2/Number%202%20PNG%20images%20free%20download_PNG14949.png',
+           scaledSize: new google.maps.Size(23, 23),
+    
+        };
+        var img5 = {
+          url: 'https://pngimg.com/uploads/number1/number1_PNG14888.png',
+           scaledSize: new google.maps.Size(23, 23),
+    
+        };
+          
+           var danger_in=[];
+
+
+
+             for (var k = 0, len = response.routes.length; k < len; k++) {
+              danger_in[k]=0;
+              var points = response.routes[k].overview_path;
+              
+
+
+         
+               var  infoWindow = new google.maps.InfoWindow;
+               var posInit;
+                        var count = 0;
+                        var count1 = 0
+                        var l;
+                        l=k+1;
+             for (var j = 0; j < points.length; j++) {
+                      for (var i = 0; i < mydata.length; i++) {
+                   
+                        var s1 = mydata[i].lati.toString();
+                        s1=s1.slice(0,(s1.indexOf("."))+3);
+                        var s3 = mydata[i].longi.toString();
+                        s3=s3.slice(0,(s3.indexOf("."))+3);
+                        var s2 = points[j].lng().toString();
+                        s2=s2.slice(0,(s2.indexOf("."))+3);
+                        var s4 = points[j].lat().toString();
+                        s4=s4.slice(0,(s4.indexOf("."))+3);
+                      
+                         if ((s1 === s2) && (s3 === s4))
+                          {// console.log(s1);
+                            // console.log(s3);
+                            count++;
+                              posInit = new google.maps.LatLng(mydata[i].longi,mydata[i].lati);
+                           
+                               if(mydata[i].properties.mag==4){
+         var marker = new google.maps.Marker({
+          position: new google.maps.LatLng(mydata[i].longi,mydata[i].lati),
+          icon:img1,
+           title:mydata[i].n,
+                     animation: google.maps.Animation.DROP,
+
+          map: map
+        });
+danger_in[k]+=5;
+count1++;
+         }
+         else if(mydata[i].properties.mag==3){
+         var marker = new google.maps.Marker({
+          position: new google.maps.LatLng(mydata[i].longi,mydata[i].lati),
+          title:mydata[i].n,
+                    animation: google.maps.Animation.DROP,
+
+          icon:img2,
+          map: map
+        }); danger_in[k]+=4;
+       count1++;}
+       else if(mydata[i].properties.mag==2){
+         var marker = new google.maps.Marker({
+          position: new google.maps.LatLng(mydata[i].longi,mydata[i].lati),
+          icon:img3,
+           title:mydata[i].n,
+                     animation: google.maps.Animation.DROP,
+
+          map: map
+        }); danger_in[k]+=3;
+       count1++;}
+        else if(mydata[i].properties.mag==1){
+         var marker = new google.maps.Marker({
+          position: new google.maps.LatLng(mydata[i].longi,mydata[i].lati),
+          icon:img4,
+           title:mydata[i].n,
+          animation: google.maps.Animation.DROP,
+
+          map: map
+        }); danger_in[k]+=2;
+       count1++;}
+        else if(mydata[i].properties.mag==0){
+         var marker = new google.maps.Marker({
+          position: new google.maps.LatLng(mydata[i].longi,mydata[i].lati),
+          icon:img5,
+           title:mydata[i].n,
+          animation: google.maps.Animation.DROP,
+
+          map: map
+        }); danger_in[k]+=1;
+count1++;
+       }
+                        
+                  }
+                  }
+
+                }
+              //   console.log(count1);
+              // console.log(danger_in[k]);
+              // console.log(count);
+ danger_in[k]/=(count);
+
+
+
+
+
+
+ 
+   
+     
+        }
+
+
+
+var danger_hash  = {};
+for(var i = 0; i < danger_in.length; i++) {
+    danger_hash[i] = danger_in[i];
+}
+    
+// console.log(danger_in);
+danger_in=danger_in.sort();
+
+keysSorted = Object.keys(danger_hash).sort(function(a,b){return danger_hash[a]-danger_hash[b]})
+// console.log(keysSorted[0]); 
+
+var array_values = new Array();
+for (var key in keysSorted) {
+    array_values.push(keysSorted[key]);
+}
+
+for(var i = 0; i < array_values.length; i++) {
+array_values[i]=parseInt(array_values[i]);
+
+}
+
+var h = new Object(); 
+h[0] = "green";
+h[1] = "yellow";
+h[2] = "red";
+h[3] = "blue";
+h[4] = "pink";
+
+var array_v = new Array();
+
+for(var i = 0; i < array_values.length; i++) {
+
+array_v[array_values[i]]=i;
+}
+
+if(array_values.length===2)
+{
+  h[1]="red";
+}
+else
+{
+  h[1]="yellow";
+}
+
+// console.log(array_values);
+
+// console.log(array_v);
+
+
+
+
+var div = document.createElement('div');
+ div.className = "ui container"
+ document.body.appendChild(div);
+
+div.innerHTML = '<br><center><h1 id='+"h11"+'></center><br>';
+
+document.getElementById("h11").innerHTML = "GREEN PATH is with the Lowest Danger Index";
+String.prototype.capitalize = function() {
+    return this.charAt(0).toUpperCase() + this.slice(1);
+}
+
+
+var div = document.createElement('div');
+ div.className = "ui container horizontal segments"
+ div.id="d1";
+ document.body.appendChild(div);
+
+var i=0;
+while(i<array_v.length){
+k=array_v[i];
+p=array_values[i];
+new google.maps.DirectionsRenderer({
+                    map: map,
+                    directions: response,
+                    routeIndex: i,
+                     unitSystem: google.maps.UnitSystem.METRIC,
+                    provideRouteAlternatives: true,
+                      polylineOptions: {
+                    strokeColor: h[k],
+                    strokeOpacity: 0.7,
+                    strokeWeight: 7
+
+                }
+
+                });
+
+
+var div = document.createElement('div');
+ div.className = "ui "+h[k]+" segment"
+ document.body.appendChild(div);
+ var col = "color"+k,
+    safetyi = "safetyi"+k,
+
+ dis = "distance"+k,
+   dur = "duration"+k;
+  
+ div.innerHTML = '<ol class="ui list"><li value="*" id='+col+'></li><li value="*" id='+safetyi+'></li><li value="*" id='+dis+'></li><li value="*" id='+dur+'></li></ul>';
+ l=k+1;
+    var objTo = document.getElementById('d1');
+        objTo.appendChild(div);
+
+
+
+if(array_v.length===2){
+if(h[k]==="green"){
+  document.getElementById(col).innerHTML = (h[k].capitalize())+" coloured path is SAFEST PATH" ;
+}else{
+    document.getElementById(col).innerHTML = (h[k].capitalize())+" colored Path is an ALTERNATE PATH " ;
+
+}
+        infoWindow.setPosition(posInit);
+      var message = 'Danger Index:'+danger_in[k].toPrecision(5);
+  document.getElementById(safetyi).innerHTML = message;
+
+   document.getElementById(dis).innerHTML = "Distance  : " +
+      response.routes[i].legs[0].distance.text ;
+    
+    document.getElementById(dur).innerHTML = "Time  : " +
+      response.routes[i].legs[0].duration.text;
+   
+
+}
+else{
+if(array_v.length===3){
+if(h[k]==="green"){
+  document.getElementById(col).innerHTML = (h[k].capitalize())+" coloured Path is SAFEST PATH" ;
+}else{
+    document.getElementById(col).innerHTML = (h[k].capitalize())+" colored Path is an ALTERNATE PATH " ;
+
+}
+        infoWindow.setPosition(posInit);
+      var message = 'Danger Index:'+danger_in[k].toPrecision(5);
+  document.getElementById(safetyi).innerHTML = message;
+
+   document.getElementById(dis).innerHTML = "Total Distance  : " +
+      response.routes[i].legs[0].distance.text ;
+    
+    document.getElementById(dur).innerHTML = "Total Time  : " +
+      response.routes[i].legs[0].duration.text;
+   
+
+}
+
+
+
+}
+
+
+
+
+
+
+
+
+
+
+
+i++;
+
+}
+
+
+
+
+
+                    
+                    
+         
+          } else {
+            window.alert('not working ' + status);
+          }
+        });
+      };
+ 
+      $(document).ready(function(){
+        navigator.geolocation.getCurrentPosition(initMap);
+      });
+
+    </script>
+    
+  </body>
+</html>

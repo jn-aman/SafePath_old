@@ -1,0 +1,856 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+
+    <title>SafePath</title>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@8"></script>
+
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/typed.js@2.0.9"></script>
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.css" >
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+
+<link href="https://fonts.googleapis.com/css?family=Spectral:700" rel="stylesheet">
+    <meta charset="utf-8">
+    <style>
+       a { color: black; }
+a:link {
+  text-decoration: none;
+  color: black;
+}
+
+a:visited {
+  text-decoration: none;
+  color: black;
+}
+
+a:hover {
+  text-decoration: none;
+  color: black;
+}
+
+a:active {
+  text-decoration: none;
+  color: black;
+}
+
+      #map {
+        height: 80%;
+width: 80%;
+/*border:1px solid;*/
+      }
+      html, body {
+        margin: 20;
+        padding: 20;
+        height: 100%;
+        
+      }
+
+      .newClass {
+  font-size: 100%;
+}
+
+    li{
+font-family: 'Spectral', serif;
+font-style: bold;
+font-size: 110%;
+
+      }
+      .controls {
+        height: 30px;
+       
+               border-radius: 10px 10px 10px 10px;
+
+        border: 1px solid transparent;
+         margin-top: 11px;
+ 
+      }
+
+      #enter-origin,
+      #enter-des {
+        background-color: #fff;
+        font-family: Roboto;
+        font-size: 15px;
+        font-weight: 300;
+        margin-left: 12px;
+        padding: 0 11px 0 13px;
+        text-overflow: ellipsis;
+        width: 200px;
+      }
+
+      #enter-origin:focus,
+      #enter-des:focus {
+        border-color: #4d90fe;
+      }
+
+      #select-mode {
+        color: #fff;
+        background-color: black;
+        margin-left: 12px;
+        padding: 5px 11px 0px 11px;
+      }
+
+      #select-mode label {
+        font-family: Roboto;
+        font-size: 13px;
+        font-weight: 300;
+      }
+     
+#safepath{
+          font-size: 13px;
+
+}
+
+
+    </style>
+  </head>
+  <body>
+    
+<br>
+<!-- <div class="ui placeholder segment container">
+ -->  <div class="ui  center aligned grid">
+    
+<!--     <div class="middle aligned row">
+ -->      
+      <div class="column">
+
+        <div class="ui icon header ">
+
+          
+ 
+
+
+
+<a href="/paths/create">  <i class="world icon"></i><h1 style="margin: -5px" id="typed" ></h1>   </a>
+
+<script>
+Swal.fire({
+  type: 'info',
+  title: 'SafePath',
+  text: 'Click on "GLOBE" to Report Crime.',
+})
+    var options = {
+  strings: [ "SafePath"],
+  typeSpeed: 140,
+  showCursor: false
+
+}
+
+    var typed = new Typed("#typed", options);
+
+    window.addEventListener('popstate', () => {
+  location.reload();
+}, false);
+
+
+</script>
+
+
+</div>
+        
+      </div>
+    </div>
+  <!-- </div> -->
+<!-- </div>
+ -->
+
+<input id="enter-origin" class="controls" type="text" placeholder="Origin">
+
+
+<input id="enter-des" class="controls" type="text"  placeholder="Destination">
+
+
+<script >
+  
+// $(document).ready(function(){
+//   if( $("#enter-origin")!=""){
+//    $("#enter-origin").change(function(){
+//       window.location.reload(true);
+//    });
+// }
+// });
+
+</script>
+
+    <div id="select-mode" class="controls" >
+      <input type="radio" name="type" id="changemode-walking" >
+      <label for="changemode-walking">Walk</label>
+
+      <input type="radio" name="type" id="changemode-transit">
+      <label for="changemode-transit">Transit</label>
+
+      <input type="radio" name="type" id="changemode-driving" checked="checked">
+      <label for="changemode-driving">Drive</label>
+    </div>
+
+    <div id="map" class="ui container"></div>
+  
+     <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAi5YIk-_EH65BJt7We9f3LVqydLZ9Esms&libraries=places"
+        ></script>
+   
+
+
+    <script>
+   
+
+
+
+      var  mydata = <%= raw json_escape(@p.to_json) %>;
+
+        var map;
+        var directionsDisplay;
+          var directionsService;
+          var markers = [];
+var pathdetails = [
+  [, ],
+  [, ],
+  [, ],
+  [, ],
+  [, ],
+
+
+
+];
+          function setMapOnAll(map) {
+        for (var i = 0; i < markers.length; i++) {
+          markers[i].setMap(map);
+        }
+      }
+function clearMarkers() {
+        setMapOnAll(null);
+      }
+
+
+function showMarkers() {
+        setMapOnAll(map);
+      }
+
+
+      function initMap(location) {
+         directionsService = new google.maps.DirectionsService();
+          directionsDisplay = new google.maps.DirectionsRenderer();
+          var loc = new google.maps.LatLng(location.coords.latitude,location.coords.longitude);
+        
+
+if(document.body.clientWidth > 600){
+
+map = new google.maps.Map(document.getElementById('map'), {
+          zoom: 10,
+          
+
+          mapTypeControl: true,
+          mapTypeControlOptions: {
+              style: google.maps.MapTypeControlStyle.HORIZONTAL_BAR,
+              position: google.maps.ControlPosition.TOP_RIGHT
+          },
+          center: loc,
+        });
+
+
+
+}
+else
+{
+
+map = new google.maps.Map(document.getElementById('map'), {
+          zoom: 10,
+          
+
+          mapTypeControl: false,
+          mapTypeControlOptions: {
+              style: google.maps.MapTypeControlStyle.HORIZONTAL_BAR,
+              position: google.maps.ControlPosition.TOP_RIGHT
+          },
+          center: loc,
+        });
+
+
+}
+        
+
+
+
+        var marker = new google.maps.Marker({
+          position: loc,
+         // icon: 'https://m.schuepfen.ch/icons/helveticons/black/60/Pin-location.png',
+          animation: google.maps.Animation.DROP,
+title:"You are Here",
+          map: map
+        }); 
+markers.push(marker);
+         directionsDisplay.setMap(map);
+         var script = document.createElement('script');
+         document.getElementsByTagName('head')[0].appendChild(script);
+
+          map.data.setStyle(function(feature) {
+          var magnitude = feature.getProperty('mag');
+         // console.log(typeof(magnitude));
+          return {
+            icon: getCircle(magnitude)
+          };
+        });
+        new AutocompleteDirectionsHandler(map);
+      }
+      function getCircle(magnitude) {
+        return {
+          path: google.maps.SymbolPath.CIRCLE,
+          fillColor: 'red',
+          fillOpacity: .2,
+          scale: Math.pow(2, magnitude) / 2,
+          strokeColor: 'red',
+          strokeWeight: .6
+        };
+      }
+
+       
+      function AutocompleteDirectionsHandler(map) {
+        this.map = map;
+        this.originPlaceId = null;
+        this.destinationPlaceId = null;
+        this.travelMode = 'DRIVING';
+        var originInput = document.getElementById('enter-origin');
+        var modeSelector = document.getElementById('select-mode');
+        var destinationInput = document.getElementById('enter-des');
+        this.directionsDisplay = new google.maps.DirectionsRenderer;
+
+        this.directionsService = new google.maps.DirectionsService;
+        // this.directionsDisplay.setMap(map);
+
+        var originAutocomplete = new google.maps.places.Autocomplete(
+            originInput, {place_id: true});
+        var destinationAutocomplete = new google.maps.places.Autocomplete(
+            destinationInput, {place_id: true});
+        this.setupClickListener('changemode-walking', 'WALKING');
+        
+        this.setupClickListener('changemode-transit', 'TRANSIT');
+        this.setupClickListener('changemode-driving', 'DRIVING');
+
+        this.setupPlaceChangedListener(originAutocomplete, 'ORIG');
+                this.setupPlaceChangedListener(destinationAutocomplete, 'DEST');
+
+
+        
+
+     if(document.body.clientWidth < 600)
+ {this.map.controls[google.maps.ControlPosition.LEFT_TOP].push(originInput);
+                this.map.controls[google.maps.ControlPosition.LEFT_TOP].push(destinationInput);
+        this.map.controls[google.maps.ControlPosition.LEFT_TOP].push(modeSelector);
+
+
+
+}else
+{this.map.controls[google.maps.ControlPosition.TOP_LEFT].push(originInput);
+                this.map.controls[google.maps.ControlPosition.TOP_LEFT].push(destinationInput);
+  this.map.controls[google.maps.ControlPosition.TOP_LEFT].push(modeSelector);
+
+}
+
+
+      }
+
+    
+      AutocompleteDirectionsHandler.prototype.setupClickListener = function(id, mode) {
+                var me = this;
+
+        var radioButton = document.getElementById(id);
+        radioButton.addEventListener('click', function() {
+          me.travelMode = mode;
+          me.route();
+        });
+      };
+
+var pathdetails = [
+  [, ],
+  [, ],
+  [, ],
+  [, ],
+  [, ],
+
+
+
+];
+
+
+      AutocompleteDirectionsHandler.prototype.setupPlaceChangedListener = function(autocomplete, mode) {
+
+
+
+
+        var me = this;
+
+ pathdetails = [
+  [, ],
+  [, ],
+  [, ],
+  [, ],
+  [, ],
+
+
+
+];
+        autocomplete.bindTo('bounds', this.map);
+        autocomplete.addListener('place_changed', function() {
+
+          var place = autocomplete.getPlace();
+          var directionsDisplay = new google.maps.DirectionsRenderer();
+
+          if (!place.place_id) {
+            window.alert("Select from dropdown only");
+            return;
+          }
+          if (mode === 'ORIG') {
+            me.originPlaceId = place.place_id;
+          } else {
+            me.destinationPlaceId = place.place_id;
+          }
+pathdetails = [
+  [, ],
+  [, ],
+  [, ],
+  [, ],
+  [, ],
+
+
+
+];
+          me.route();
+        });
+
+      };
+
+
+
+
+      AutocompleteDirectionsHandler.prototype.route = function() {
+        if (!this.originPlaceId || !this.destinationPlaceId) {
+          return;
+        }
+        var me = this;
+clearMarkers();
+ pathdetails = [
+  [, ],
+  [, ],
+  [, ],
+  [, ],
+  [, ],
+
+
+
+];
+
+        this.directionsService.route({
+          origin: {'placeId': this.originPlaceId},
+          destination: {'placeId': this.destinationPlaceId},
+          travelMode: this.travelMode,
+          provideRouteAlternatives: true,
+          unitSystem: google.maps.UnitSystem.METRIC
+        }, function(response, status) {
+          if (status === 'OK') {
+            var img1 = {
+          url: 'https://pngimg.com/uploads/number5/number5_PNG15082.png',
+           scaledSize: new google.maps.Size(28, 28),
+    
+        };
+          var img2 = {
+          url: 'https://pngimg.com/uploads/number4/number4_PNG15036.png',
+           scaledSize: new google.maps.Size(28, 28),
+    
+        };
+        ;
+          var img3 = {
+          url: 'https://pngimg.com/uploads/number3/number3_PNG14994.png',
+           scaledSize: new google.maps.Size(23, 23),
+    
+        };
+        var img4 = {
+          url: 'https://pngimg.com/uploads/number2/Number%202%20PNG%20images%20free%20download_PNG14949.png',
+           scaledSize: new google.maps.Size(23, 23),
+    
+        };
+        var img5 = {
+          url: 'https://pngimg.com/uploads/number1/number1_PNG14888.png',
+           scaledSize: new google.maps.Size(23, 23),
+    
+        };
+          
+           var danger_in=[];
+
+
+
+
+for (var k = 0, len = response.routes.length; k < len; k++){
+
+var points = response.routes[k].overview_path;
+
+  for (var j = 0; j < points.length; j++) {
+
+                      for (var i = 0; i < mydata.length; i++) {
+                   
+                        var s1 = mydata[i].lati.toString();
+                        s1=s1.slice(0,(s1.indexOf("."))+3);
+                        var s3 = mydata[i].longi.toString();
+                        s3=s3.slice(0,(s3.indexOf("."))+3);
+                        var s2 = points[j].lng().toString();
+                        s2=s2.slice(0,(s2.indexOf("."))+3);
+                        var s4 = points[j].lat().toString();
+                        s4=s4.slice(0,(s4.indexOf("."))+3);
+                      
+                         if ((s1 === s2) && (s3 === s4)){
+
+                          pathdetails[k].push([mydata[i].lati,mydata[i].longi]);
+                         }
+}
+}
+
+
+}
+// console.log(pathdetails);
+
+
+             for (var k = 0, len = response.routes.length; k < len; k++) {
+              danger_in[k]=0;
+              var points = response.routes[k].overview_path;
+              
+
+
+         
+               var  infoWindow = new google.maps.InfoWindow;
+               var posInit;
+                        var count = 0;
+                        var count1 = 0
+                        var l;
+                        l=k+1;
+             for (var j = 0; j < points.length; j++) {
+
+                      for (var i = 0; i < mydata.length; i++) {
+                   
+                        var s1 = mydata[i].lati.toString();
+                        s1=s1.slice(0,(s1.indexOf("."))+3);
+                        var s3 = mydata[i].longi.toString();
+                        s3=s3.slice(0,(s3.indexOf("."))+3);
+                        var s2 = points[j].lng().toString();
+                        s2=s2.slice(0,(s2.indexOf("."))+3);
+                        var s4 = points[j].lat().toString();
+                        s4=s4.slice(0,(s4.indexOf("."))+3);
+                      
+                         if ((s1 === s2) && (s3 === s4))
+                          {
+                            count++;
+                              posInit = new google.maps.LatLng(mydata[i].longi,mydata[i].lati);
+                           
+                               if(mydata[i].properties.mag==4){
+         var marker = new google.maps.Marker({
+          position: new google.maps.LatLng(mydata[i].longi,mydata[i].lati),
+          icon:img1,
+           title:mydata[i].n,
+                     // animation: google.maps.Animation.DROP,
+
+          map: map
+        });
+         markers.push(marker);
+danger_in[k]+=5;
+count1++;
+         }
+         else if(mydata[i].properties.mag==3){
+         var marker = new google.maps.Marker({
+          position: new google.maps.LatLng(mydata[i].longi,mydata[i].lati),
+          title:mydata[i].n,
+                    // animation: google.maps.Animation.DROP,
+
+          icon:img2,
+          map: map
+        }); danger_in[k]+=4;
+         markers.push(marker);
+       count1++;}
+       else if(mydata[i].properties.mag==2){
+         var marker = new google.maps.Marker({
+          position: new google.maps.LatLng(mydata[i].longi,mydata[i].lati),
+          icon:img3,
+           title:mydata[i].n,
+                     // animation: google.maps.Animation.DROP,
+
+          map: map
+        }); danger_in[k]+=3;
+         markers.push(marker);
+       count1++;}
+        else if(mydata[i].properties.mag==1){
+         var marker = new google.maps.Marker({
+          position: new google.maps.LatLng(mydata[i].longi,mydata[i].lati),
+          icon:img4,
+           title:mydata[i].n,
+          // animation: google.maps.Animation.DROP,
+
+          map: map
+        }); danger_in[k]+=2;
+         markers.push(marker);
+       count1++;}
+        else if(mydata[i].properties.mag==0){
+         var marker = new google.maps.Marker({
+          position: new google.maps.LatLng(mydata[i].longi,mydata[i].lati),
+          icon:img5,
+           title:mydata[i].n,
+          // animation: google.maps.Animation.DROP,
+
+          map: map
+        }); danger_in[k]+=1;
+         markers.push(marker);
+count1++;
+       }
+                        
+                  }
+                  }
+
+                }
+              //   console.log(count1);
+              // console.log(danger_in[k]);
+              // console.log(count);
+ danger_in[k]/=(count);
+
+
+
+
+
+
+ 
+   
+     
+        }
+
+
+// console.log(markers);
+
+// showMarkers();
+
+directionsDisplay = new google.maps.DirectionsRenderer();
+
+var danger_hash  = {};
+for(var i = 0; i < danger_in.length; i++) {
+    danger_hash[i] = danger_in[i];
+}
+    
+// console.log(danger_in);
+danger_in=danger_in.sort();
+
+keysSorted = Object.keys(danger_hash).sort(function(a,b){return danger_hash[a]-danger_hash[b]})
+// console.log(keysSorted[0]); 
+
+var array_values = new Array();
+for (var key in keysSorted) {
+    array_values.push(keysSorted[key]);
+}
+
+for(var i = 0; i < array_values.length; i++) {
+array_values[i]=parseInt(array_values[i]);
+
+}
+
+var h = new Object(); 
+h[0] = "green";
+h[1] = "yellow";
+h[2] = "red";
+h[3] = "blue";
+h[4] = "pink";
+h[5] = "pink";
+
+var array_v = new Array();
+
+for(var i = 0; i < array_values.length; i++) {
+
+array_v[array_values[i]]=i;
+}
+
+if(array_values.length===2)
+{
+  h[1]="red";
+}
+else
+{
+  h[1]="yellow";
+}
+
+// console.log(array_values);
+
+// console.log(array_v);
+
+
+
+
+var div = document.createElement('div');
+
+ div.className = "ui container"
+ document.body.appendChild(div);
+
+div.innerHTML = '<br><center><h1 id='+"h11"+'></center><br>';
+
+document.getElementById("h11").innerHTML = "GREEN PATH is with the Lowest Danger Index";
+String.prototype.capitalize = function() {
+    return this.charAt(0).toUpperCase() + this.slice(1);
+}
+
+
+var div = document.createElement('div');
+ div.className = "ui container horizontal segments"
+ div.id="d1";
+ document.body.appendChild(div);
+
+var i=0;
+
+
+
+if (directionsDisplay != null) {
+    directionsDisplay.setMap(null);
+    directionsDisplay = null;
+}
+
+
+
+while(i<array_v.length){
+
+k=array_v[i];
+p=array_values[i];
+console.log(directionsDisplay);
+
+
+directionsDisplay=new google.maps.DirectionsRenderer({
+                    map: map,
+                    directions: response,
+                    routeIndex: i,
+                     unitSystem: google.maps.UnitSystem.METRIC,
+                    // provideRouteAlternatives: true,
+                      polylineOptions: {
+                    strokeColor: h[k],
+                    strokeOpacity: 0.7,
+                    strokeWeight: 7
+
+                }
+
+                });
+
+
+var div = document.createElement('div');
+ div.className = "ui "+h[k]+" segment"
+ document.body.appendChild(div);
+ var col = "color"+k,
+    safetyi = "safetyi"+k,
+
+ dis = "distance"+k,
+   dur = "duration"+k;
+  
+ div.innerHTML = '<ol class="ui list"><li class="c1" value="*" id='+col+'></li><li class="c1" value="*" id='+safetyi+'></li><li class="c1" value="*" id='+dis+'></li><li class="c1" value="*" id='+dur+'></li></ul>';
+ l=k+1;
+    var objTo = document.getElementById('d1');
+        objTo.appendChild(div);
+
+
+
+if(array_v.length===2){
+
+
+
+if(document.body.clientWidth < 600)
+{
+
+  $(".c1").addClass('newClass');
+
+}
+
+
+if(h[k]==="green"){
+  document.getElementById(col).innerHTML = (h[k].capitalize())+" coloured path is SAFEST PATH" ;
+}else{
+    document.getElementById(col).innerHTML = (h[k].capitalize())+" colored Path is an ALTERNATE PATH " ;
+
+}
+        infoWindow.setPosition(posInit);
+      var message = 'Danger Index:'+danger_in[k].toPrecision(5);
+  document.getElementById(safetyi).innerHTML = message;
+
+   document.getElementById(dis).innerHTML = "Distance  : " +
+      response.routes[i].legs[0].distance.text ;
+    
+    document.getElementById(dur).innerHTML = "Time  : " +
+      response.routes[i].legs[0].duration.text;
+   
+
+}
+else{
+if(array_v.length===3){
+
+
+if(document.body.clientWidth < 600)
+{
+
+  $(".c1").addClass('newClass');
+
+}
+
+
+
+
+
+
+if(h[k]==="green"){
+  document.getElementById(col).innerHTML = (h[k].capitalize())+" coloured Path is SAFEST PATH" ;
+}else{
+    document.getElementById(col).innerHTML = (h[k].capitalize())+" colored Path is an ALTERNATE PATH " ;
+
+}
+        infoWindow.setPosition(posInit);
+      var message = 'Danger Index:'+danger_in[k].toPrecision(5);
+  document.getElementById(safetyi).innerHTML = message;
+
+   document.getElementById(dis).innerHTML = "Total Distance  : " +
+      response.routes[i].legs[0].distance.text ;
+    
+    document.getElementById(dur).innerHTML = "Total Time  : " +
+      response.routes[i].legs[0].duration.text;
+   
+
+}
+
+
+
+}
+
+
+
+
+
+
+
+
+
+
+
+i++;
+
+}
+
+
+
+
+
+
+                    
+                    
+         
+          } else {
+            window.alert('not working ' + status);
+          }
+        });
+      };
+ 
+      $(document).ready(function(){
+        navigator.geolocation.getCurrentPosition(initMap);
+      });
+
+    </script>
+    
+  </body>
+</html>
