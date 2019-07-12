@@ -23,8 +23,11 @@
 <!--   <p>The form below contains two dropdown menus (select lists):</p>
  -->  <form>
     <div class="form-group">
-      <label for="sel1">Select Locality of the Crime :</label><br>
-      <select class="form-control" onchange="a()" id="sel1" name="sellist1">
+      <label for="sel1">Select Type of the Crime :
+
+      </label><br>
+      <select  class="form-control" onchange="a()" id="sel1" name="sellist1">
+
 <option class="aman"> </option>
        <% for i in @clist do %>
 
@@ -32,7 +35,7 @@
         <% end%>
       </select>
       <br>
-      <label for="sel2">Select Type of the Crime :</label><br>
+      <label for="sel2">Select Locality of the Crime :</label><br>
 <select class="form-control pla" id="sel2" name="sellist2">
        
       </select>
