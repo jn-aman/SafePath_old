@@ -2,7 +2,12 @@ class PathsController < ApplicationController
   def Map
   
 
-   @p=eval(`python3 getscore.py`)
+  sql="select * FROM final;"
+
+@p=ActiveRecord::Base.connection.exec_query(sql).to_hash;
+   
+
+   # @p=eval(`python3 getscore.py`)
   
 
 
