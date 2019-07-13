@@ -198,13 +198,13 @@ for i in range(0, 166):
     y2[i] = round(y2[i], 4)
 
     o = {  "n": places[i],
-        "type": "Feature",
-           "properties": { 'mag': y[i]   },                 
+            'mag': y[i]  ,                 
             'lati': y1[i], 
             'longi': y2[i]
            
             
         }
     ar.append(o)
-print(ar)
+loc=pd.DataFrame.from_dict(ar)
+loc.to_sql('final', con=database_connection, if_exists='replace',chunksize=1000,index=False)
 

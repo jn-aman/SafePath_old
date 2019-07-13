@@ -1,6 +1,11 @@
 class PathsController < ApplicationController
   def Map
-  @p=eval(`python3 ruby_python.py`)
+  
+
+   @p=eval(`python3 getscore.py`)
+  
+
+
   end
 
 def create
@@ -37,6 +42,8 @@ puts locality
 sql="UPDATE initial SET " + type+" = "+ type +" + 1 where localities = "+ locality.to_str + ";"
 
 col=ActiveRecord::Base.connection.execute(sql)
+   @p=eval(`python3 ruby_python.py`)
+
   render json: {}, status: 200
 
      #    respond_to do |format|
@@ -45,8 +52,10 @@ col=ActiveRecord::Base.connection.execute(sql)
      #  format.js   { render :layout => false }
     	# end	
 end
+ 
+def test
 
-
+end
 
 
 
