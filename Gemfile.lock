@@ -83,7 +83,7 @@ GEM
     nokogiri (1.8.5)
       mini_portile2 (~> 2.3.0)
     pg (0.21.0)
-    puma (3.12.0)
+    puma (3.12.2)
     rack (2.0.6)
     rack-test (0.6.3)
       rack (>= 1.0)
@@ -167,7 +167,7 @@ DEPENDENCIES
   listen (~> 3.0.5)
   mysql2
   pg (~> 0.18)
-  puma (~> 3.0)
+  puma (~> 3.12)
   rails (~> 5.0.7)
   sass-rails (~> 5.0)
   spring
