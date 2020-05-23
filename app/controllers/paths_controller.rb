@@ -47,7 +47,7 @@ puts locality
 sql="UPDATE initial SET " + type+" = "+ type +" + 1 where localities = "+ locality.to_str + ";"
 
 col=ActiveRecord::Base.connection.execute(sql)
-   @p=eval(`python3 ruby_python.py`)
+   `python ruby_python.py`
 
   render json: {}, status: 200
 

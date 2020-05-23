@@ -31,7 +31,7 @@ import pandas as pd
 
 from sqlalchemy import create_engine
 database_username = 'root'
-database_password = ''
+database_password = 'jainxx'
 database_ip       = 'localhost'
 database_name     = 'safepath'
 database_connection = create_engine('mysql+mysqlconnector://{0}:{1}@{2}/{3}'.
