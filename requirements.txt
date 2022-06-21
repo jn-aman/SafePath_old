@@ -68,7 +68,7 @@ matplotlib == 3.1.1
 # SafePath/Python_new/ruby_python.ipynb: 1,54,86
 # SafePath/getscore.py: 7
 # SafePath/ruby_python.py: 7,102,176
-numpy == 1.17.2
+numpy == 1.22.0
 
 # SafePath/Python/.ipynb_checkpoints/KMeans-checkpoint.ipynb: 163
 # SafePath/Python/.ipynb_checkpoints/clustering-checkpoint.ipynb: 6
